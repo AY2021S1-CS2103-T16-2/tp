@@ -1,19 +1,13 @@
 package seedu.address.storage;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import seedu.address.commons.exceptions.IllegalValueException;
-import seedu.address.model.person.Email;
-import seedu.address.model.person.Name;
-import seedu.address.model.person.Person;
-import seedu.address.model.person.Phone;
+import seedu.address.model.person.*;
 import seedu.address.model.tag.Tag;
 
 /**
@@ -27,19 +21,21 @@ class JsonAdaptedPerson {
     private final String phone;
     private final String email;
     private final List<JsonAdaptedTag> tagged = new ArrayList<>();
+    private final String remark;
 
     /**
      * Constructs a {@code JsonAdaptedPerson} with the given person details.
      */
     @JsonCreator
     public JsonAdaptedPerson(@JsonProperty("name") String name, @JsonProperty("phone") String phone,
-            @JsonProperty("email") String email, @JsonProperty("tagged") List<JsonAdaptedTag> tagged) {
+            @JsonProperty("email") String email, @JsonProperty("tagged") List<JsonAdaptedTag> tagged, @JsonProperty("remark") String remark) {
         this.name = name;
         this.phone = phone;
         this.email = email;
         if (tagged != null) {
             this.tagged.addAll(tagged);
         }
+        this.remark = remark;
     }
 
     /**
@@ -52,6 +48,12 @@ class JsonAdaptedPerson {
         tagged.addAll(source.getTags().stream()
                 .map(JsonAdaptedTag::new)
                 .collect(Collectors.toList()));
+        if(source.getRemark().isEmpty()) {
+            remark = "";
+        }
+        else {
+            remark = source.getRemark().get().toString();
+        }
     }
 
     /**
@@ -90,7 +92,16 @@ class JsonAdaptedPerson {
         final Email modelEmail = new Email(email);
 
         final Set<Tag> modelTags = new HashSet<>(personTags);
-        return new Person(modelName, modelPhone, modelEmail, modelTags);
+
+        if (remark == null) {
+            throw new IllegalValueException(String.format(MISSING_FIELD_MESSAGE_FORMAT, Remark.class.getSimpleName()));
+        }
+        if (!Remark.isValidRemark(remark)) {
+            throw new IllegalValueException((Remark.MESSAGE_CONSTRAINTS));
+        }
+        final Optional<Remark> modelRemark = Optional.ofNullable(new Remark(remark));
+
+        return new Person(modelName, modelPhone, modelEmail, modelTags, modelRemark);
     }
 
 }

@@ -6,10 +6,12 @@ import seedu.address.logic.parser.exceptions.ParseException;
 import seedu.address.model.person.Email;
 import seedu.address.model.person.Name;
 import seedu.address.model.person.Phone;
+import seedu.address.model.person.Remark;
 import seedu.address.model.tag.Tag;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
@@ -104,5 +106,17 @@ public class ParserUtil {
             tagSet.add(parseTag(tagName));
         }
         return tagSet;
+    }
+
+    public static Optional<Remark> parseRemark(Optional<String> remark) throws ParseException {
+        requireNonNull(remark);
+        if(remark.isEmpty()) {
+            return Optional.empty();
+        }
+        String trimmedRemark = remark.get().trim();
+        if(!Remark.isValidRemark(trimmedRemark)) {
+            throw new ParseException(Remark.MESSAGE_CONSTRAINTS);
+        }
+        return Optional.ofNullable(new Remark(trimmedRemark));
     }
 }

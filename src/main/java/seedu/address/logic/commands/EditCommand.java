@@ -5,10 +5,7 @@ import seedu.address.commons.core.index.Index;
 import seedu.address.commons.util.CollectionUtil;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
-import seedu.address.model.person.Email;
-import seedu.address.model.person.Name;
-import seedu.address.model.person.Person;
-import seedu.address.model.person.Phone;
+import seedu.address.model.person.*;
 import seedu.address.model.tag.Tag;
 
 import java.util.*;
@@ -88,8 +85,9 @@ public class EditCommand extends Command {
         Phone updatedPhone = editPersonDescriptor.getPhone().orElse(personToEdit.getPhone());
         Email updatedEmail = editPersonDescriptor.getEmail().orElse(personToEdit.getEmail());
         Set<Tag> updatedTags = editPersonDescriptor.getTags().orElse(personToEdit.getTags());
+        Optional<Remark> updatedRemark = editPersonDescriptor.getRemark().orElse(personToEdit.getRemark());
 
-        return new Person(updatedName, updatedPhone, updatedEmail, updatedTags);
+        return new Person(updatedName, updatedPhone, updatedEmail, updatedTags, updatedRemark);
     }
 
     @Override
@@ -119,6 +117,7 @@ public class EditCommand extends Command {
         private Phone phone;
         private Email email;
         private Set<Tag> tags;
+        private Optional<Remark> remark;
 
         public EditPersonDescriptor() {}
 
@@ -131,13 +130,14 @@ public class EditCommand extends Command {
             setPhone(toCopy.phone);
             setEmail(toCopy.email);
             setTags(toCopy.tags);
+            setRemark(toCopy.remark);
         }
 
         /**
          * Returns true if at least one field is edited.
          */
         public boolean isAnyFieldEdited() {
-            return CollectionUtil.isAnyNonNull(name, phone, email, tags);
+            return CollectionUtil.isAnyNonNull(name, phone, email, tags, remark);
         }
 
         public void setName(Name name) {
@@ -163,6 +163,10 @@ public class EditCommand extends Command {
         public Optional<Email> getEmail() {
             return Optional.ofNullable(email);
         }
+
+        public void setRemark(Optional<Remark> remark) {this.remark = remark; }
+
+        public Optional<Optional<Remark>> getRemark() { return Optional.ofNullable(remark); }
 
         /**
          * Sets {@code tags} to this object's {@code tags}.
@@ -199,7 +203,8 @@ public class EditCommand extends Command {
             return getName().equals(e.getName())
                     && getPhone().equals(e.getPhone())
                     && getEmail().equals(e.getEmail())
-                    && getTags().equals(e.getTags());
+                    && getTags().equals(e.getTags())
+                    && getRemark().equals(e.getRemark());
         }
     }
 }
